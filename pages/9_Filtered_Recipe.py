@@ -52,9 +52,9 @@ def read_filtered_recipes(api, access_token, recipe_category, page=1):
         st.error(f"요청 중 오류 발생: {e}")
         return None
 
-# 페이지 번호 상태 유지
-if 'page' not in st.session_state:
-    st.session_state.page = 1
+# 페이지 번호 상태 유지 (9_Filtered_Recipe 페이지용)
+if 'filtered_page' not in st.session_state:
+    st.session_state.filtered_page = 1
 
 # 현재 페이지 기록
 st.session_state.previous_page = "pages/9_Filtered_Recipe.py"
@@ -70,7 +70,7 @@ selected_category_name = st.selectbox("Recipe Category", category_names)
 category_id = get_category_id(selected_category_name)
 
 # 레시피 데이터 불러오기
-data = read_filtered_recipes(API_URL, st.session_state.access_token, recipe_category=category_id, page=st.session_state.page)
+data = read_filtered_recipes(API_URL, st.session_state.access_token, recipe_category=category_id, page=st.session_state.filtered_page)
 
 if data:
     recipes = data.get("results", {}).get("results", {})
@@ -94,15 +94,14 @@ if data:
 
     # 페이지네이션 버튼
     col1, col2, col3 = st.columns([1, 4, 1])
-
     with col1:
         if data.get("previous") is not None:
             if st.button("Previous Page"):
-                st.session_state.page -= 1
+                st.session_state.filtered_page -= 1
                 st.rerun()
 
     with col3:
         if data.get("next") is not None:
             if st.button("Next Page"):
-                st.session_state.page += 1
+                st.session_state.filtered_page += 1
                 st.rerun()

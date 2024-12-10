@@ -51,6 +51,11 @@ else:
                 st.write(f"**조리시간:** {recipe.get('recipe_time')}분")
                 st.write(f"**난이도:** {recipe.get('recipe_level')}")
                 st.write(f"**주재료:** {', '.join(recipe.get('main_ingre', []))}")
+                
+                # 상세 페이지로 이동 버튼
+                if st.button(f"View Recipe Details {recipe_id}", key=recipe_id):
+                    st.session_state.selected_recipe = recipe
+                    st.switch_page("pages/10_Recipe_Detail.py")
                 st.write("---")
 
         # 페이지네이션 버튼

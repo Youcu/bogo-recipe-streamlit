@@ -2,9 +2,13 @@
 import streamlit as st
 import requests
 
-# 인증 토큰 및 API URL
-ACCESS_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNzMzNjM4NTQwLCJpYXQiOjE3MzM2MzY3NDAsImp0aSI6ImQ1ZmFhMTk4YzIxODQ5ZTY5NjM2MzQ1MTYyNjQzNjg4IiwidXNlcl9pZCI6Mn0.8Uc_1msK5r1xopq4lkfi3jCIj68vv8KW4wiNMFYdJAI"
+# API URL
 API_URL = "https://bogo-recipe.com/api/recipes/filtered-recipes/"
+
+# 세션 상태에 토큰이 없으면 로그인 페이지로 이동
+if "access_token" not in st.session_state:
+    st.warning("로그인이 필요합니다.")
+    st.switch_page("pages/2_Sign_In.py")
 
 # API 함수
 def read_filtered_recipes(api, access_token, recipe_category, page=1):
@@ -35,25 +39,24 @@ st.title("Filtered Recipe Page")
 category = st.selectbox("Recipe Category", [-1, 1, 2, 3])  # 예제 카테고리 값
 
 # 레시피 데이터 불러오기
-data = read_filtered_recipes(API_URL, ACCESS_TOKEN, recipe_category=category, page=st.session_state.page)
+data = read_filtered_recipes(API_URL, st.session_state.access_token, recipe_category=category, page=st.session_state.page)
 
 if data:
     recipes = data.get("results", {}).get("results", {})
 
     # 레시피 출력
-    for recipe_id, recipe in recipes.items():
-        with st.container():
+    cols = st.columns(3)
+    for i, (recipe_id, recipe) in enumerate(recipes.items()):
+        with cols[i % 3]:
             st.image(recipe.get("thumb"), width=150)
             st.subheader(recipe.get("recipe_name"))
             st.write(f"**조리시간:** {recipe.get('recipe_time')}분")
             st.write(f"**난이도:** {recipe.get('recipe_level')}")
             st.write(f"**주재료:** {', '.join(recipe.get('main_ingre', []))}")
-            st.write("---")
-
-    # 디버그 출력
-    st.write(f"Next Page URL: {data.get('next')}")
-    st.write(f"Previous Page URL: {data.get('previous')}")
-    st.write(f"Current Page: {st.session_state.page}")
+            # 버튼을 클릭하면 상세 페이지로 이동
+            if st.button(f"View Details {recipe_id}", key=recipe_id):
+                st.session_state.selected_recipe = recipe
+                st.switch_page("pages/10_Recipe_Detail.py")
 
     # 페이지네이션 버튼
     col1, col2, col3 = st.columns([1, 4, 1])

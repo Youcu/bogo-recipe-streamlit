@@ -1,4 +1,4 @@
-### in pages/Recipe_Detail.py ###
+### in pages/10_Recipe_Detail.py ###
 import streamlit as st
 
 # 세션 상태에서 선택한 레시피 정보 가져오기
@@ -27,6 +27,7 @@ if "selected_recipe" in st.session_state:
     # 동영상 링크가 있을 경우
     video_src = recipe.get("video_src")
     if video_src and video_src != "nan":
+        st.write("---")
         st.subheader("레시피 동영상")
         st.video(video_src)
 
@@ -44,7 +45,7 @@ if "selected_recipe" in st.session_state:
 
     # 뒤로 가기 버튼
     if st.button("Back to Recipes"):
-        st.switch_page("pages/8_Entire_Recipe.py")
+        st.switch_page(st.session_state.previous_page)
 
 else:
     st.warning("레시피를 선택해주세요.")
